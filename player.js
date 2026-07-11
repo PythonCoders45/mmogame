@@ -1,4 +1,12 @@
 var player = new Player(10, 10)
+var stats = {};
+
+stats.coins = localStorage.setItem('coins', 20);
+stats.username = localStorage.setItem('username', );;
+stats.color = localStorage.setItem('color', 'blue');;
+stats.accessories = localStorage.setItem('accessories', ['top hat']);
+stats.achivements = localStorage.setItem('achivements', ['Joined!']);
+
 var Player = function (x, y) {
   this.x = x;
   this.y = y;
