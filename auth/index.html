@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Penguin - Login & Sign Up</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            background-color: #0099ff;
+            font-family: 'Arial Rounded MT Bold', 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .auth-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 0px #0066cc;
+            border: 5px solid #004499;
+            width: 360px;
+            text-align: center;
+        }
+
+        /* Tabs for Switching */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #eee;
+        }
+
+        .tab {
+            font-size: 18px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            padding-bottom: 10px;
+            width: 50%;
+            text-transform: uppercase;
+        }
+
+        .tab.active {
+            color: #0066cc;
+            border-bottom: 4px solid #0066cc;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 3px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #0099ff;
+        }
+
+        /* Color Picker Grid */
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .color-option {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            margin: 0 auto;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #333;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #cc7700;
+            width: 100%;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .action-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0px #cc7700;
+        }
+        
+        .error-msg {
+            color: #ff3333;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="tabs">
+        <div class="tab active" id="loginTab">Log In</div>
+        <div class="tab" id="signupTab">Sign Up</div>
+    </div>
+
+    <div id="loginSection" class="form-section active">
+        <div class="error-msg" id="loginError"></div>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="loginName">Name:</label>
+                <input type="text" id="loginName" placeholder="Enter your name..." required>
+            </div>
+            <div class="input-group">
+                <label for="loginPass">Password:</label>
+                <input type="password" id="loginPass" placeholder="Enter password..." required>
+            </div>
+            <button type="submit" class="action-btn">Walk On</button>
+        </form>
+    </div>
+
+    <div id="signupSection" class="form-section">
+        <div class="error-msg" id="signupError"></div>
+        <form id="signupForm">
+            <div class="input-group">
+                <label for="signupName">Choose Name:</label>
+                <input type="text" id="signupName" placeholder="Max 12 characters..." required maxlength="12">
+            </div>
+            <div class="input-group">
+                <label for="signupPass">Choose Password:</label>
+                <input type="password" id="signupPass" placeholder="Password..." required>
+            </div>
+            
+            <div class="input-group">
+                <label>Choose Your Color:</label>
+                <div class="color-picker">
+                    <div class="color-option selected" style="background-color: #0055ff;" data-color="blue"></div>
+                    <div class="color-option" style="background-color: #ff3333;" data-color="red"></div>
+                    <div class="color-option" style="background-color: #00cc44;" data-color="green"></div>
+                    <div class="color-option" style="background-color: #ffcc00;" data-color="yellow"></div>
+                    <div class="color-option" style="background-color: #cc33ff;" data-color="purple"></div>
+                    <div class="color-option" style="background-color: #ff66cc;" data-color="pink"></div>
+                    <div class="color-option" style="background-color: #333333;" data-color="black"></div>
+                    <div class="color-option" style="background-color: #ff9900;" data-color="orange"></div>
+                </div>
+            </div>
+            <button type="submit" class="action-btn">Create Player</button>
+        </form>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var selectedColor = "blue";
+
+    // --- TAB SWITCHING LOGIC ---
+    $('#loginTab').click(function() {
+        $('.tab').removeClass('active');
+        $(this).addClass('active');
+        $('.form-section').removeClass('active');
+        $('#loginSection').addClass('active');
+    });
+
+    $('#signupTab').click(function() {
+        $('.tab').removeClass('active');
+        $(this).addClass('active');
+        $('.form-section').removeClass('active');
+        $('#signupSection').addClass('active');
+    });
+
+    // --- COLOR PICKER ---
+    $('.color-option').click(function() {
+        $('.color-option').removeClass('selected');
+        $(this).addClass('selected');
+        selectedColor = $(this).data('color');
+    });
+
+    // --- SIGN UP LOGIC ---
+    $('#signupForm').submit(function(e) {
+        e.preventDefault();
+        $('#signupError').hide();
+
+        var username = $('#signupName').val().trim();
+        var password = $('#signupPass').val();
+
+        // Check if username already exists in localStorage
+        if (localStorage.getItem('user_' + username)) {
+            $('#signupError').text("That penguin name is already taken!").show();
+            return;
+        }
+
+        // Create player registry object
+        var newPlayerAccount = {
+            username: username,
+            password: password,
+            color: selectedColor,
+            coins: 50, // bonus starting coins for signing up!
+            accessories: ['top hat'],
+            achievements: ['Joined!']
+        };
+
+        // Save account under a custom user key, and set them as the active session user
+        localStorage.setItem('user_' + username, JSON.stringify(newPlayerAccount));
+        setCurrentSession(newPlayerAccount);
+
+        alert("Account created successfully! Welcome to the island!");
+        window.location.href = 'game.html';
+    });
+
+    // --- LOGIN LOGIC ---
+    $('#loginForm').submit(function(e) {
+        e.preventDefault();
+        $('#loginError').hide();
+
+        var username = $('#loginName').val().trim();
+        var password = $('#loginPass').val();
+
+        // Attempt to fetch saved user profile data
+        var savedUserData = localStorage.getItem('user_' + username);
+
+        if (!savedUserData) {
+            $('#loginError').text("Penguin not found! Check your spelling or Sign Up.").show();
+            return;
+        }
+
+        var account = JSON.parse(savedUserData);
+
+        // Check password matching
+        if (account.password !== password) {
+            $('#loginError').text("Incorrect password! Try again.").show();
+            return;
+        }
+
+        // Log them into active profile variables
+        setCurrentSession(account);
+
+        alert("Welcome back, " + username + "!");
+        window.location.href = 'game.html';
+    });
+
+    // Helper function to sync active variables with your player.js logic setup
+    function setCurrentSession(accountObj) {
+        localStorage.setItem('username', accountObj.username);
+        localStorage.setItem('color', accountObj.color);
+        localStorage.setItem('coins', accountObj.coins);
+        localStorage.setItem('accessories', JSON.stringify(accountObj.accessories));
+        localStorage.setItem('achievements', JSON.stringify(accountObj.achievements));
+    }
+});
+</script>
+
+</body>
+</html>
